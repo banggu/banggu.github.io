@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>summary_of_process_android_target26 | Hexo</title>
+  <meta name="description" content="Android Target 26 处理遇到的问题 最近项目升 target26处理，遇到了很多问题，这里总结一下：  1.BrocastReceiver相关 由于 Android 8.0 引入了新的广播接收器限制，注册的隐式广播在运行时将不起作用，因此需要移除大部分的隐式广播。主要的处理方式有以下三种：  隐式广播白名单 使用 JobScheduler 实现类似的功能 使用动态注册的广播  1">
+<meta name="keywords" content="Android Learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="summary_of_process_android_target26">
+<meta property="og:url" content="https://banggu.github.io/2018/11/25/summary-of-process-android-target26/index.html">
+<meta property="og:site_name" content="爱喝茶的帮主">
+<meta property="og:description" content="Android Target 26 处理遇到的问题 最近项目升 target26处理，遇到了很多问题，这里总结一下：  1.BrocastReceiver相关 由于 Android 8.0 引入了新的广播接收器限制，注册的隐式广播在运行时将不起作用，因此需要移除大部分的隐式广播。主要的处理方式有以下三种：  隐式广播白名单 使用 JobScheduler 实现类似的功能 使用动态注册的广播  1">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-25T09:25:24.814Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="summary_of_process_android_target26">
+<meta name="twitter:description" content="Android Target 26 处理遇到的问题 最近项目升 target26处理，遇到了很多问题，这里总结一下：  1.BrocastReceiver相关 由于 Android 8.0 引入了新的广播接收器限制，注册的隐式广播在运行时将不起作用，因此需要移除大部分的隐式广播。主要的处理方式有以下三种：  隐式广播白名单 使用 JobScheduler 实现类似的功能 使用动态注册的广播  1">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://banggu.github.io/2018/11/25/summary-of-process-android-target26/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="爱喝茶的帮主" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="../../../../css/style.css">
+  
+  
+  
+  
+</head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/cofess" target="_blank">
+          <img class="img-circle img-rotate" src="../../../../images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">昵称</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Shenzhen, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索">
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech="">
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope="" itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="../../../../.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="../../../../archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="../../../../categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="../../../../tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="../../../../repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="../../../../books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="../../../../links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="../../../../about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/cofess" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle="tooltip" data-placement="top"><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle="tooltip" data-placement="top"><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="../../../../atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope="" itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="../../../../categories/Android-Learning/">Android Learning</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="../../../../tags/Android-Learning/">Android Learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="../../../../tags/Android-Text-LinearGradient/">Android Text LinearGradient</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="../../../../tags/Android-Learning/" style="font-size: 13px;">Android Learning</a> <a href="../../../../tags/Android-Text-LinearGradient/" style="font-size: 13px;">Android Text LinearGradient</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="../../../../archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="../../../../archives/2018/11/">十一月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="../../../../archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="../../../12/23/hello-world/" class="title">Hello World</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-12-23T11:00:29.128Z" itemprop="datePublished">2018-12-23</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="" class="title">summary_of_process_android_target26</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-11-25T09:21:58.000Z" itemprop="datePublished">2018-11-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="../../../../categories/Android-Learning/">Android Learning</a>
+              </p>
+              <p class="item-title">
+                <a href="../../../10/22/androidTextLinearColorGradient/" class="title">androidTextLinearColorGradient</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-10-22T15:29:23.000Z" itemprop="datePublished">2018-10-22</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-summary-of-process-android-target26" class="article article-type-post" itemscope="" itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      summary_of_process_android_target26
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="" class="article-date">
+	  <time datetime="2018-11-25T09:21:58.000Z" itemprop="datePublished">2018-11-25</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="../../../../tags/Android-Learning/">Android Learning</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h3 id="android-target-26-处理遇到的问题"><a class="markdownIt-Anchor" href="#android-target-26-处理遇到的问题"></a> Android Target 26 处理遇到的问题</h3>
+<p>最近项目升 target26处理，遇到了很多问题，这里总结一下：</p>
+<h4 id="1brocastreceiver相关"><a class="markdownIt-Anchor" href="#1brocastreceiver相关"></a> <strong>1.BrocastReceiver相关</strong></h4>
+<p>由于 Android 8.0 引入了新的广播接收器限制，注册的隐式广播在运行时将不起作用，因此需要移除大部分的隐式广播。主要的处理方式有以下三种：</p>
+<ul>
+<li>隐式广播白名单</li>
+<li>使用 JobScheduler 实现类似的功能</li>
+<li>使用动态注册的广播</li>
+</ul>
+<p><strong>1.1隐式广播白名单</strong></p>
+<p>在8.0中还是有部分隐式广播可以继续使用，它们就是“白名单”广播，包括：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ACTION_LOCKED_BOOT_COMPLETED, ACTION_BOOT_COMPLETED</span><br><span class="line">ACTION_USER_INITIALIZE</span><br><span class="line">ACTION_LOCALE_CHANGED</span><br><span class="line"></span><br><span class="line">ACTION_USB_ACCESSORY_ATTACHED, ACTION_USB_ACCESSORY_DETACHED, ACTION_USB_DEVICE_ATTACHED, ACTION_USB_DEVICE_DETACHED</span><br><span class="line"></span><br><span class="line">ACTION_CONNECTION_STATE_CHANGED, ACTION_CONNECTION_STATE_CHANGED, ACTION_ACL_CONNECTED, ACTION_ACL_DISCONNECTED</span><br><span class="line"></span><br><span class="line">ACTION_CARRIER_CONFIG_CHANGED,TelephonyIntents.ACTION_*_SUBSCRIPTION_CHANGED, &quot;TelephonyIntents.SECRET_CODE_ACTION&quot;, ACTION_PHONE_STATE_CHANGED, ACTION_PHONE_ACCOUNT_REGISTERED, ACTION_PHONE_ACCOUNT_UNREGISTERED</span><br><span class="line"></span><br><span class="line">LOGIN_ACCOUNTS_CHANGED_ACTION</span><br><span class="line">ACTION_ACCOUNT_REMOVED</span><br><span class="line">ACTION_PACKAGE_DATA_CLEARED</span><br><span class="line">ACTION_PACKAGE_FULLY_REMOVED</span><br><span class="line">ACTION_NEW_OUTGOING_CALL</span><br><span class="line">ACTION_DEVICE_OWNER_CHANGED</span><br><span class="line">ACTION_EVENT_REMINDER</span><br><span class="line"></span><br><span class="line">ACTION_MEDIA_MOUNTED, ACTION_MEDIA_CHECKING, ACTION_MEDIA_UNMOUNTED, ACTION_MEDIA_EJECT, ACTION_MEDIA_UNMOUNTABLE, ACTION_MEDIA_REMOVED, ACTION_MEDIA_BAD_REMOVAL</span><br><span class="line"></span><br><span class="line">SMS_RECEIVED_ACTION, WAP_PUSH_RECEIVED_ACTION</span><br></pre></td></tr></table></figure>
+<p>具体说明可参见官方文档：</p>
+<p><a href="https://developer.android.com/guide/components/broadcast-exceptions?hl=zh-cn" target="_blank" rel="noopener">Implicit Broadcast Exceptions</a></p>
+<p><strong>1.2使用 JobScheduler 实现类似的功能</strong></p>
+<p>在许多情况下，之前注册隐式广播可以使用 <code>JobScheduler</code> 实现类似的功能。如设备网络状态变化、设备充电状态变化、低电量等。JobScheduler的用法在下面”后台服务相关“会说明。</p>
+<p><strong>1.3使用动态注册的广播</strong></p>
+<p>之前用的静态注册的隐式广播可以改为动态注册的方式实现，建议是在Application类中注册，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CacheReceiver mCacheReceiver = new CacheReceiver();</span><br><span class="line">registerReceiver(mCacheReceiver, createIntentFilter(</span><br><span class="line">				ApplicationId.APPLICATION_ID + 	</span><br><span class="line">        		&quot;.transaction.BootCompleteReceiver.BOOT_COMPLETED&quot;,</span><br><span class="line">                ApplicationId.APPLICATION_ID + &quot;.transaction.cachereceiver&quot;,</span><br><span class="line">                ApplicationId.APPLICATION_ID + &quot;.transaction.cachedata&quot;</span><br><span class="line">                ));</span><br><span class="line">                </span><br><span class="line">private IntentFilter createIntentFilter(String... actions) &#123;</span><br><span class="line">	IntentFilter intentFilter = new IntentFilter();</span><br><span class="line">    for (String action : actions) &#123;</span><br><span class="line">    	intentFilter.addAction(action);</span><br><span class="line">    &#125;</span><br><span class="line">    return intentFilter;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2后台服务相关"><a class="markdownIt-Anchor" href="#2后台服务相关"></a> <strong>2.后台服务相关</strong></h4>
+<p>Android8.0对后台服务做了限制，使得此前一直使用的后台服务（Start Service）无法正常工作。<strong>注意是Start Service，Bind Service不受影响</strong>，仍可以正常使用。下面是官方文档的说明：</p>
+<blockquote>
+<p>处于前台时，应用可以自由创建和运行前台服务与后台服务。 进入后台时，在一个持续数分钟的时间窗内，应用仍可以创建和使用服务。</p>
+<p>在该时间窗结束后，应用将被视为处于 <em>空闲</em> 状态。 此时，系统将停止应用的后台服务，就像应用已经调用服务的“<code>Service.stopSelf()</code>”方法。</p>
+<p>如果针对 Android 8.0 的应用尝试在不允许其创建后台服务的情况下使用 <code>startService()</code> 函数，则该函数将引发一个 <code>IllegalStateException</code>。</p>
+</blockquote>
+<p>处理的方式有四种：</p>
+<ul>
+<li>对于重要程度不高的服务，try-catch 住 <code>startService()</code> 方法</li>
+<li>使用 JobIntentService 代替 IntentService</li>
+<li>使用 JobScheduler</li>
+<li>使用前台服务代替后台服务</li>
+</ul>
+<p><strong>2.1 try-catch 住 <code>startService()</code> 方法</strong></p>
+<p>对于重要程度不高的服务，try-catch 住 <code>startService()</code> 方法，不出现崩溃即可，因为系统会有一个持续数分钟的时间窗来启动和处理服务，我们无法知道系统什么时候允许应用创建后台服务。在允许时，系统自动回去启动服务，不允许时，也不会crash。</p>
+<p><strong>2.2使用 JobIntentService 代替 IntentService</strong></p>
+<p>如果之前的后台服务是用IntentService实现的，则可用JobIntentService代替。</p>
+<p>JobIntentService的用法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class InstallMonitorJobIntentService extends JobIntentService &#123;</span><br><span class="line">   private static final int JOB_ID = 1001;</span><br><span class="line"></span><br><span class="line">   public static void enqueueWork(Context context, Intent work) &#123;</span><br><span class="line">       if (null == work) &#123;</span><br><span class="line">           return;</span><br><span class="line">        &#125;</span><br><span class="line">      enqueueWork(context, InstallMonitorJobIntentService.class, JOB_ID, work);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   @Override</span><br><span class="line">   protected void onHandleWork(@NonNull Intent intent) &#123;</span><br><span class="line">      if (null == intent) &#123;</span><br><span class="line">         return;</span><br><span class="line">      &#125;</span><br><span class="line">      checkInstall(intent);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   @Override</span><br><span class="line">   public void onDestroy() &#123;</span><br><span class="line">      super.onDestroy();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>记得在menifest注册时要申明<strong>android.permission.BIND_JOB_SERVICE</strong>权限，否则会出现java.lang.IllegalArgumentException</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;service android:name=&quot;.monitor.InstallMonitorJobIntentService&quot;</span><br><span class="line">    android:permission=&quot;android.permission.BIND_JOB_SERVICE&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>2.3 使用 JobScheduler实现短耗时的后台服务</strong></p>
+<p>对于短耗时的后台服务，可以使用 JobScheduler实现，JobScheduler的用法和 JobIntentService 很相似，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public class InstallMonitorJobService extends JobService &#123;</span><br><span class="line">   public static final String PACKAGE_NAME_KEY = &quot;package_name_key&quot;;</span><br><span class="line">   private static final String TAG = InstallMonitorJobService.class.getSimpleName();</span><br><span class="line">   private String mPkgName;</span><br><span class="line">   </span><br><span class="line">   public static void startScheduleJob (Context context, String pkg) &#123;</span><br><span class="line">        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, </span><br><span class="line">        		new ComponentName(context, InstallMonitorJobService.class));</span><br><span class="line">        builder.setOverrideDeadline(2000);</span><br><span class="line">        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);</span><br><span class="line"></span><br><span class="line">        PersistableBundle extras = new PersistableBundle();</span><br><span class="line">        extras.putString(InstallMonitorJobService.PACKAGE_NAME_KEY, pkg);</span><br><span class="line">        builder.setExtras(extras);</span><br><span class="line"></span><br><span class="line">        JobScheduler mJobScheduler = 	</span><br><span class="line">        	(JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);</span><br><span class="line">        </span><br><span class="line">        // 这里就将开始在service里边处理我们配置好的job</span><br><span class="line">        mJobScheduler.schedule(builder.build());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   @Override</span><br><span class="line">   public void onDestroy() &#123;</span><br><span class="line">      super.onDestroy();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   @Override</span><br><span class="line">   public boolean onStartJob(JobParameters params) &#123;</span><br><span class="line">      if (Loger.isD()) &#123;</span><br><span class="line">         Log.e(TAG, &quot;InstallMonitorJobService onStartJob&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      mPkgName = params.getExtras().getString(PACKAGE_NAME_KEY);</span><br><span class="line">      checkInstall(mPkgName);</span><br><span class="line">      return true;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   @Override</span><br><span class="line">   public boolean onStopJob(JobParameters params) &#123;</span><br><span class="line">      if (Loger.isD()) &#123;</span><br><span class="line">         Log.e(TAG, &quot;InstallMonitorJobService onStopJob&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      return false;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，JobScheduler同样需要在menifest的注册中申明 <strong>android.permission.BIND_JOB_SERVICE</strong> 权限。</p>
+<p><strong>2.4 使用前台服务代替长耗时的后台服务</strong></p>
+<p>使用新的 <code>Context.startForegroundService()</code> 方法启动一个前台服务，并且必须在创建服务后的五秒内调用该服务的 <code>startForeground()</code> 函数。否则会出现ANR。</p>
+<h4 id="3权限相关"><a class="markdownIt-Anchor" href="#3权限相关"></a> <strong>3.权限相关</strong></h4>
+<p>在 Android 8.0 之前，如果应用在运行时请求权限并且被授予该权限，系统会错误地将属于同一权限组并且在清单中注册的其他权限也一起授予应用。</p>
+<p>对于针对 Android 8.0 的应用，此行为已被纠正。系统只会授予应用明确请求的权限。然而，一旦用户为应用授予某个权限，则所有后续对该权限组中权限的请求都将被自动批准。</p>
+<p>我们项目处理target26时遇到过这类异常：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Non-fatal Exception: java.lang.SecurityException</span><br><span class="line">Permission Denial: opening provider com.android.providers.contacts.ContactsProvider2 from ProcessRecord&#123;ada6f44 14724:com.cjb.tomatoSchedulers/u0a173&#125; (pid=14724, uid=10173) requires android.permission.READ_CONTACTS or android.permission.WRITE_CONTACTS</span><br><span class="line">android.os.Parcel.readException (Parcel.java:1959)</span><br><span class="line">android.content.ContentResolver.registerContentObserver (ContentResolver.java:1919)</span><br><span class="line">...</span><br><span class="line">android.os.Handler.dispatchMessage (Handler.java:105)</span><br><span class="line">android.os.HandlerThread.run (HandlerThread.java:65)</span><br></pre></td></tr></table></figure>
+<p>这类异常出现的场景是，应用被按非正常流程启动，比如应用从未打开或从未授权过，此时收到推送或者广播被拉起，进入一个需要使用某些敏感权限的页面，则会出现crash。可以在这些需要授权的地方加入权限判断，若需要申请权限且可以申请（在页面中），则先申请授权；若需要申请且不能申请（在Serviece中，用户不能授权），则关闭当前操作并返回。</p>
+<h4 id="4悬浮窗相关"><a class="markdownIt-Anchor" href="#4悬浮窗相关"></a> <strong>4.悬浮窗相关</strong></h4>
+<p>在Android8.0中，使用 <code>SYSTEM_ALERT_WINDOW</code> 权限的应用无法再使用以下窗口类型来在其他应用和系统窗口上方显示提醒窗口：</p>
+<ul>
+<li><code>TYPE_PHONE</code></li>
+<li><code>TYPE_PRIORITY_PHONE</code></li>
+<li><code>TYPE_SYSTEM_ALERT</code></li>
+<li><code>TYPE_SYSTEM_OVERLAY</code></li>
+<li><code>TYPE_SYSTEM_ERROR</code></li>
+</ul>
+<p>相反，应用必须使用名为 <code>TYPE_APPLICATION_OVERLAY</code> 的新窗口类型。</p>
+<p>使用 <code>TYPE_APPLICATION_OVERLAY</code> 窗口类型显示应用的提醒窗口时，请记住新窗口类型的以下特性：</p>
+<ul>
+<li>应用的提醒窗口始终显示在状态栏和输入法等关键系统窗口的下面。</li>
+<li>系统可以移动使用 <code>TYPE_APPLICATION_OVERLAY</code> 窗口类型的窗口或调整其大小，以改善屏幕显示效果。</li>
+<li>通过打开通知栏，用户可以访问设置来阻止应用显示使用 <code>TYPE_APPLICATION_OVERLAY</code> 窗口类型显示的提醒窗口。</li>
+</ul>
+<h4 id="5通知渠道相关"><a class="markdownIt-Anchor" href="#5通知渠道相关"></a> <strong>5.通知渠道相关</strong></h4>
+<p>Android 8.0 重新设计了通知，从8.0开始，通知都必须通过通知渠道推送。否则，通知将不会出现在通知栏且会报错。</p>
+<p>创建通知栏的代码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createNotificationChannel</span><span class="params">(<span class="keyword">int</span> channelId)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Create the NotificationChannel, but only on API 26+ because</span></span><br><span class="line">    <span class="comment">// the NotificationChannel class is new and not in the support library</span></span><br><span class="line">    <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">        CharSequence name = getString(R.string.channel_name);</span><br><span class="line">        String description = getString(R.string.channel_description);</span><br><span class="line">        <span class="keyword">int</span> importance = NotificationManager.IMPORTANCE_DEFAULT;</span><br><span class="line">        NotificationChannel channel = <span class="keyword">new</span> NotificationChannel(channelId, name, </span><br><span class="line">        		importance);</span><br><span class="line">        channel.setDescription(description);</span><br><span class="line">        <span class="comment">// Register the channel with the system; you can't change the importance</span></span><br><span class="line">        <span class="comment">// or other notification behaviors after this</span></span><br><span class="line">        NotificationManager notificationManager = </span><br><span class="line">            getSystemService(NotificationManager.class);</span><br><span class="line">        notificationManager.createNotificationChannel(channel);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>用原先的值创建已经存在的渠道不执行任何操作，所以可以在Application类中创建渠道。</strong></p>
+<p>通过通知渠道推送通知的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">createNotificationChannel(channelId, 	</span><br><span class="line">		MyApp.getApp().getString(R.string.channel_name_push),</span><br><span class="line">        NotificationManager.IMPORTANCE_HIGH , sound);</span><br><span class="line">NotificationCompat.Builder builder = new NotificationCompat.Builder(context, 	</span><br><span class="line">		channelId);</span><br><span class="line">builder.setGroup(</span><br><span class="line">        SelfMAppUrlActionNotiIdVariable.NOTIFICATION_GROUP_KEY_NEW_MESSAGE)</span><br><span class="line">        .setSmallIcon(iconRes)</span><br><span class="line">        .setTicker(showText)</span><br><span class="line">        .setWhen(timeMillis)</span><br><span class="line">        .setLargeIcon(largeIcon)</span><br><span class="line">        .setAutoCancel(true)</span><br><span class="line">        setContentTitle(msgTitle)</span><br><span class="line">       .setContentText(msgDsp)</span><br><span class="line">       .setContentIntent(pendingIntent)</span><br><span class="line">       .setDeleteIntent(deleteIntent);</span><br><span class="line">Notification notification = builder.build();</span><br><span class="line">NotificationManager nm = </span><br><span class="line">	(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);</span><br><span class="line">nm.notify(notifyId, notification);</span><br></pre></td></tr></table></figure>
+<p><strong>注意在将通知推送到通知渠道之后，该通知的属性就不能修改了，包括震动、铃声这些，所以若需要修改则只能新建一个渠道</strong>。还有每次新建渠道之前记得删除掉之前的渠道，注意只删除那些没有通知的渠道。</p>
+<p>用下面的方法删除：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public static void deleteNoNumberNotification(String newChannelId) &#123;</span><br><span class="line">    NotificationManager nm = (NotificationManager) MmsApp.getMmsApp().getSystemService(NOTIFICATION_SERVICE);</span><br><span class="line">    if (Build.VERSION.SDK_INT &lt;= Build.VERSION_CODES.O) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;NotificationChannel&gt; notificationChannels = nm.getNotificationChannels();</span><br><span class="line">    if (notificationChannels == null) &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    for (NotificationChannel channel : notificationChannels) &#123;</span><br><span class="line">        if (channel.getId() == null || channel.getId().equals(newChannelId)) &#123;</span><br><span class="line">            continue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int notificationNumbers = getNotificationNumbers(nm, channel.getId());</span><br><span class="line">        if (notificationNumbers == 0) &#123;</span><br><span class="line">            nm.deleteNotificationChannel(channel.getId());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private static int getNotificationNumbers(NotificationManager mNotificationManager, 		String channelId) &#123;</span><br><span class="line">        if (mNotificationManager == null || TextUtils.isEmpty(channelId)) &#123;</span><br><span class="line">            return -1;</span><br><span class="line">        &#125;</span><br><span class="line">        int numbers = 0;</span><br><span class="line">        StatusBarNotification[] activeNotifications = </span><br><span class="line">        	mNotificationManager.getActiveNotifications();</span><br><span class="line">        for (StatusBarNotification item : activeNotifications) &#123;</span><br><span class="line">            Notification notification = item.getNotification();</span><br><span class="line">            if (notification != null) &#123;</span><br><span class="line">                if (channelId.equals(notification.getChannelId())) &#123;</span><br><span class="line">                    numbers++;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return numbers;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>我们项目在处理自定义铃声时就遇到这个问题，之前的通知铃声是直接通过notification来实现的，没有使用通知渠道来处理消息通知，所以通知铃声会无法生效。改为用通知渠道推送通知后，就可以了。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://banggu.github.io/2018/11/25/summary-of-process-android-target26/" title="summary_of_process_android_target26" target="_blank" rel="external">https://banggu.github.io/2018/11/25/summary-of-process-android-target26/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/cofess" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="../../../../images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/cofess" target="_blank"><span class="text-dark">昵称</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom="">
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="../../../12/23/hello-world/" title="Hello World"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="../../../10/22/androidTextLinearColorGradient/" title="androidTextLinearColorGradient"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="../../../../images/donate/alipayimg.png" alt="扫码支持" title="扫一扫">
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="../../../../images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫">
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope="" itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/cofess" target="_blank" title="Github" data-toggle="tooltip" data-placement="top"><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle="tooltip" data-placement="top"><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle="tooltip" data-placement="top"><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle="tooltip" data-placement="top"><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="../../../../atom.xml" target="_blank" title="Rss" data-toggle="tooltip" data-placement="top"><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="../../../../js/plugin.min.js"></script>
+<script src="../../../../js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '../../../../content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="../../../../js/insight.js"></script>
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
